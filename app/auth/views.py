@@ -3,7 +3,8 @@ from flask_login import login_user, logout_user, login_required, current_user
 from . import auth
 from ..models import User
 from ..email import send_email
-from .forms import LoginForm, RegistrationForm, ChangePasswordForm, PasswordResetForm, PasswordResetRequestForm
+from .forms import LoginForm, RegistrationForm, ChangePasswordForm, PasswordResetForm, \
+    PasswordResetRequestForm, ChangeEmailForm
 from .. import db
 
 
@@ -121,6 +122,7 @@ def change_password():
 
 @auth.route('/reset', methods=['GET', 'POST'])
 def password_reset_request():
+    """这是在登录条件下，重设密码看见的页面，重设密码的条件就是输入对的邮箱"""
     # 如果不是匿名用户
     if not current_user.is_anonymous:
         return redirect(url_for('main.index'))
@@ -140,6 +142,7 @@ def password_reset_request():
 
 @auth.route('/reset/<token>', methods=['GET', 'POST'])
 def password_reset(token):
+    """点击邮箱中的链接的页面"""
     if not current_user.is_anonymous:
         return redirect(url_for('main.index'))
     form = PasswordResetForm()
@@ -151,3 +154,21 @@ def password_reset(token):
         else:
             return redirect(url_for('main.index'))
     return render_template('auth/reset_password.html', form=form)
+
+
+@auth.route('/change_email', methods=['GET', 'POST'])
+@login_required
+def change_email_request():
+    form = ChangeEmailForm()
+    if form.validate_on_submit():
+        if current_user.verify_password(form.password.data):
+            new_email = form.email.data
+            token = current_user.generate_email_change_token(new_email)
+            send_email(new_email, 'Confirm your email address',
+                       'auth/email/change_email',
+                       user=current_user, token=token)
+            flash('An email with instructions to confirm your new email address has been sent to you')
+            return redirect(url_for('main.index'))
+        else:
+            flash('Invalid email or password')
+    return render_template('auth/change_email.html', form=form)

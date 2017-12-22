@@ -57,6 +57,7 @@ class User(UserMixin, db.Model):
 
     @staticmethod
     def reset_password(token, new_password):
+        """验证令牌，并添加新密码"""
         s = Serilizer(current_app['SECRET_KEY'])
         try:
             data = s.loads(token.encode('utf-8'))
@@ -68,6 +69,13 @@ class User(UserMixin, db.Model):
         user.password = new_password
         db.session.add(user)
         return True
+
+    def generate_email_change_token(self, new_email, expiration=3600):
+        s = Serilizer(current_app.config['SECRET_KEY'], expiration)
+        return s.dumps({'change_email': self.id, 'new_email': new_email}.decode('utf-8'))
+
+    def change_email(self, token):
+        pass
 
     def __repr__(self):
         return '<User %r>' % self.username    # %r是repr()方法处理的对象
