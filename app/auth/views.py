@@ -57,6 +57,7 @@ def register():
 @auth.route('/confirm/<token>')
 @login_required
 def confirm(token):
+    """因为login_required修饰器会保护这个路由，因此，用户点击确认邮件中的链接后，要先登录，然后才能执行这个试图函数。"""
     # 已经通过验证的用户
     if current_user.confirmed:
         return redirect(url_for('main.index'))
@@ -68,19 +69,20 @@ def confirm(token):
     return redirect(url_for('main.index'))
 
 
-# @auth.before_app_request
-# def before_request():
-#     """满足下面3个条件时，before_app_request处理程序会拦截请求
-#         1、用户已登录
-#         2、用户的账户还未确认
-#         3、请求的端点不在认证蓝本中。
-#     """
-#     if current_user.is_authenticated \
-#             and not current_user.confirmed \
-#             and request.endpoint \
-#             and request.blueprint != 'auth' \
-#             and request.endpoint != 'static':
-#         return redirect(url_for('auth.unconfirmed'))
+@auth.before_app_request
+def before_request():
+    """满足下面3个条件时，before_app_request处理程序会拦截请求
+        1、用户已登录
+        2、用户的账户还未确认
+        3、请求的端点不在认证蓝本中。
+    """
+    if current_user.is_authenticated:
+        current_user.ping()
+        if not current_user.confirmed \
+                and request.endpoint \
+                and request.blueprint != 'auth' \
+                and request.endpoint != 'static':
+            return redirect(url_for('auth.unconfirmed'))
 
 
 @auth.route('/unconfirmed')

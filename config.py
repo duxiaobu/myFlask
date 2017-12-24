@@ -10,7 +10,7 @@ class Config:
     # FlaskForm表单为了防止CSRF攻击而设置的密钥
     SECRET_KEY = config_info.get('SECRET_KEY') or 'hard to guess string'
     # 每次请求结束后都会自动提交数据库中的变动
-    SQLALCHEMY_TRACK_MODIFICATIONS = True
+    SQLALCHEMY_TRACK_MODIFICATIONS = False
     # 邮件的主题前缀
     FLASKY_MAIL_SUBJECT_PREFIX = '[Flasky]'
     FLASKY_MAIL_SENDER = '杜雄<15884538142@163.com>'
@@ -32,13 +32,13 @@ class DevelopmentConfig(Config):
     MAIL_USERNAME = config_info.get('MAIL_USERNAME')
     MAIL_PASSWORD = config_info.get('MAIL_PASSWORD')
     SQLALCHEMY_DATABASE_URI = config_info.get('DEV_DATABASE_URL') or \
-                              'sqlite:///' + os.path.join(basedir, 'date-dev.sqlite')
+                              'mysql+pymysql://root:dx050609@localhost:3306/myFlask?charset=utf8'
 
 
 class TestingConfig(Config):
     TESTING = True
     SQLALCHEMY_DATABASE_URI = config_info.get('TEST_DATABASE_URL') or \
-                              'sqlite:///' + os.path.join(basedir, 'data-test.sqlite')
+                              'mysql+pymsql://root:dx050609@localhost:3306/myFlask_test?charset=utf8'
 
 
 class ProductionConfig(Config):

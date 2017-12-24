@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+
+{% block title %}
+Flasky - {{ user.username }}
+{% endblock %}
+
+{% block page_content %}
+<div class="page-header">
+    <h1>{{ user.username }}</h1>
+<!--至少定义了这两个字段中的一个时，<p>元素才会创建 -->
+    {% if user.name or user.location %}
+    <p>
+        {% if user.name %}{{ user.name }}{% endif %}
+        {% if user.location %}
+            from <a href="http://maps.google.com/?q={{ user.location }}">{{ user.location }}</a>
+        {% endif %}
+    </p>
+    {% endif %}
+    <!-- 如果登录的用户是管理员，那么久显示用户的邮件地址，且渲染成mailto链接-->
+    {% if current_user.is_administrator() %}
+    <p><a href="mailto:{{ user.email }}">{{ user.email }}</a> </p>
+    {% endif %}
+    {% if user.about_me %}<P>{{ user.about_me }}</P>{% endif %}
+    <p>Member since {{ moment(user.member_since).format('L') }}. Last seen {{ moment(user.last_seen).fromNow() }}.</p>
+</div>
+{% endblock %}
