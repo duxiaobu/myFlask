@@ -32,13 +32,13 @@ class DevelopmentConfig(Config):
     MAIL_USERNAME = config_info.get('MAIL_USERNAME')
     MAIL_PASSWORD = config_info.get('MAIL_PASSWORD')
     SQLALCHEMY_DATABASE_URI = config_info.get('DEV_DATABASE_URL') or \
-                              'mysql+pymysql://root:dx050609@localhost:3306/myFlask?charset=utf8'
+                              'mysql+pymysql://username:yourPassword@host:port/database?charset=utf8'
 
 
 class TestingConfig(Config):
     TESTING = True
     SQLALCHEMY_DATABASE_URI = config_info.get('TEST_DATABASE_URL') or \
-                              'mysql+pymsql://root:dx050609@localhost:3306/myFlask_test?charset=utf8'
+                              'mysql+pymsql://username:yourPassword@host:port/database?charset=utf8'
 
 
 class ProductionConfig(Config):
